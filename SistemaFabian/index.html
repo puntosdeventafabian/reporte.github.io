@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Ventas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="min-h-screen">
+    <div id="message-box" style="display:none;"></div>
+    
+    <div id="main-report-area" class="max-w-xl mx-auto p-4 sm:p-6 pb-32"> 
+        
+        <header class="mb-6">
+            <h1 class="text-3xl font-extrabold text-gray-900">Reporte Diario</h1>
+        </header>
+
+        <div class="bg-white p-4 rounded-xl shadow-lg mb-6 border border-indigo-200">
+            <h2 class="text-lg font-semibold text-gray-800 mb-3">Detalles del punto</h2>
+            <div class="space-y-3">
+                <div>
+                    <label for="pos-name" class="block text-sm font-medium text-gray-700 mb-1">Punto de Venta (POS)</label>
+                    <input type="text" id="pos-name" placeholder="Ej: POS Tienda Principal" required class="input-field-mobile w-full bg-indigo-50 border-indigo-300">
+                </div>
+                <div>
+                    <label for="report-date-display" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Registro</label>
+                    <input type="text" id="report-date-display" readonly class="input-field-mobile w-full bg-gray-100 border-gray-300 cursor-default font-bold text-base">
+                    <input type="hidden" id="report-date-value">
+                </div>
+            </div>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">Inventario de Productos</h3>
+        <div id="report-list" class="space-y-4">
+            </div>
+
+        <div class="mt-6 flex justify-center">
+            <button id="add-product-btn" class="flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-300 transform hover:scale-105 active:scale-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                </svg>
+                Añadir Otro Producto
+            </button>
+        </div>
+        
+        <div class="bg-white p-4 rounded-xl shadow-lg mt-8 mb-6 border border-green-300">
+            <h2 class="text-lg font-bold text-green-700 mb-3 border-b pb-2">Gastos y Saldo en Caja</h2>
+             
+             <div class="space-y-3">
+                 <div>
+                    <label for="gastos-del-dia" class="block text-sm font-medium text-gray-700 mb-1">(-) Gastos del Día</label>
+                    <input type="number" id="gastos-del-dia" value="0" min="0" step="1000" inputmode="numeric" data-calc-field="true" class="input-field-mobile w-full text-center bg-red-50 border-red-300 font-semibold">
+                 </div>
+                 <div>
+                    <label for="transferencias-recibidas" class="block text-sm font-medium text-gray-700 mb-1">(+) Transferencias Recibidas</label>
+                    <input type="number" id="transferencias-recibidas" value="0" min="0" step="1000" inputmode="numeric" data-calc-field="true" class="input-field-mobile w-full text-center bg-blue-50 border-blue-300 font-semibold">
+                 </div>
+                 <div>
+                    <label for="otros-ingresos" class="block text-sm font-medium text-gray-700 mb-1">(+) Otros Ingresos</label>
+                    <input type="number" id="otros-ingresos" value="0" min="0" step="1000" inputmode="numeric" data-calc-field="true" class="input-field-mobile w-full text-center bg-blue-50 border-blue-300 font-semibold">
+                 </div>
+                 
+                 <div class="pt-2 border-t border-gray-200">
+                    <label for="cash-amount" class="block text-sm font-medium text-gray-700 mb-1">Dinero en Caja (total)</label>
+                    <input type="number" id="cash-amount" value="0" min="0" step="1000" inputmode="numeric" data-calc-field="true" class="input-field-mobile w-full text-center bg-green-50 border-green-300 font-bold text-xl">
+                 </div>
+             </div>
+        </div>
+
+        <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8">Historial - (Últimos Reportes)</h3>
+        
+        <div id="report-history-cards" class="history-scroll-container">
+             </div>
+        
+    </div>
+    
+    <div class="fixed-summary-bar">
+        <div class="grid grid-cols-2 gap-4 mb-3 border-b pb-3"> 
+            <div>
+                <p class="text-xs font-medium text-gray-500">Ventas Esperadas Netas</p>
+                <p id="grand-total-sales-display" class="text-2xl font-extrabold text-green-700">0</p>
+            </div>
+            <div>
+                <p id="cash-difference-label" class="text-xs font-medium text-gray-500">Saldo (Cero)</p>
+                <p id="cash-difference-display" class="text-2xl font-extrabold text-gray-600">0</p>
+            </div>
+        </div>
+        
+        <button id="save-report-btn" class="w-full px-6 py-4 bg-indigo-600 text-white text-lg font-bold rounded-xl hover:bg-indigo-700 transition shadow-lg shadow-indigo-400/50 transform hover:scale-[1.01] active:scale-95">
+            GUARDAR Y GENERAR REPORTE
+        </button>
+    </div>
+    
+    <div id="boucher-modal" class="modal-overlay hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-11/12 mx-auto modal-content-card" role="dialog" aria-modal="true">
+            <h3 class="text-2xl font-bold text-center text-gray-900 mb-4">Reporte</h3>
+            
+            <div class="max-h-96 overflow-y-auto pr-2"> 
+                <div id="boucher-content" class="text-sm">
+                    <div id="boucher-body" class="mb-4">
+                        </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col space-y-3 mt-5 pt-3 border-t border-gray-200">
+                <button id="print-boucher-btn" class="flex items-center justify-center px-4 py-3 bg-green-500 text-white font-semibold rounded-xl hover:bg-green-600 transition shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2v-3a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm2 5a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                    </svg>
+                    Imprimir / Descargar (PDF)
+                </button>
+                <button id="close-modal-btn" class="px-4 py-2 text-gray-600 bg-gray-100 font-medium rounded-xl hover:bg-gray-200 transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
